@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>公光公園アンケートフォーム</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+        h1 { border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input[type="text"], textarea, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #2ea44f; color: white; padding: 10px 15px; margin-top: 20px; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>公光公園利用者アンケート</h1>
+    <p>より良い公園運営のため、ご協力をお願いいたします。</p>
+
+    <form action="" method="POST"> 
+        
+        <label for="name">お名前 (任意):</label>
+        <input type="text" id="name" name="name">
+
+        <label for="frequency">公園の利用頻度:</label>
+        <select id="frequency" name="frequency">
+            <option value="daily">毎日</option>
+            <option value="weekly">週に数回</option>
+            <option value="monthly">月に数回</option>
+            <option value="rarely">めったに利用しない</option>
+        </select>
+
+        <label for="feedback">ご意見・ご要望:</label>
+        <textarea id="feedback" name="feedback" rows="5"></textarea>
+
+        <button type="submit">送信する</button>
+    </form>
+</body>
+</html>
