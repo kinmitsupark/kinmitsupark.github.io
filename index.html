@@ -217,88 +217,80 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'kinmitsuParkComments';
-        const MAX_COMMENTS = 20; // 最大20コメント
+    const BASE_URL = "https://comment-api-prod.kinmitsu-park.workers.dev";
+    //const BASE_URL = "http://127.0.0.1:8787"; // ローカル Worker URL (本番時はデプロイURL(自分の Worker URL)に変更)
 
-        // ----------------------------------------
-        // コメントのロードと表示
-        // ----------------------------------------
-        function loadComments() {
-            // localStorageからコメントを取得し、JSONとしてパース。データがない場合は空の配列
-            const comments = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    // ----------------------------------------
+    // コメントのロードと表示
+    // ----------------------------------------
+    async function loadComments() {
+        try {
+            const res = await fetch(`${BASE_URL}/list`);
+            const comments = await res.json();
             const commentListDiv = document.getElementById('comment-list');
-            commentListDiv.innerHTML = ''; // 既存のコメントをクリア
+            commentListDiv.innerHTML = '';
 
-            // 最新のコメントを最大数だけ取得 (新しいものから20件)
-            const latestComments = comments.slice(0, MAX_COMMENTS);
-
-            latestComments.forEach(comment => {
+            comments.forEach(comment => {
                 const commentItem = document.createElement('div');
                 commentItem.className = 'comment-item';
 
-                // コメント本文
                 const commentText = document.createElement('div');
                 commentText.className = 'comment-text';
-                commentText.textContent = comment.comment; // HTMLエスケープは不要（textContentを使用）
+                commentText.textContent = comment.comment;
 
-                // 年齢と性別のメタ情報
                 const commentMeta = document.createElement('div');
                 commentMeta.className = 'comment-meta';
-                // 表示用テキストの変換
+                // 表示用テキスト
                 const ageText = document.querySelector(`#age option[value="${comment.age}"]`).textContent || '不明';
                 const genderText = document.querySelector(`#gender option[value="${comment.gender}"]`).textContent || '不明';
-                
                 commentMeta.textContent = `${ageText} / ${genderText}`;
 
                 commentItem.appendChild(commentText);
                 commentItem.appendChild(commentMeta);
                 commentListDiv.appendChild(commentItem);
             });
+        } catch(err) {
+            console.error(err);
+            alert("コメントの取得に失敗しました。");
         }
+    }
 
-        // ----------------------------------------
-        // フォーム送信処理（コメントの保存）
-        // ----------------------------------------
-        document.getElementById('comment-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // フォームのデフォルト送信をキャンセル
-            
-            const form = event.target;
-            
-            // 入力データを取得
-            const newComment = {
-                comment: form.comment.value,
-                age: form.age.value,
-                gender: form.gender.value,
-                timestamp: new Date().toISOString() // 投稿日時
-            };
+    // ----------------------------------------
+    // フォーム送信処理
+    // ----------------------------------------
+    document.getElementById('comment-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const form = event.target;
 
-            // 既存のコメントをロード
-            const comments = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            
-            // 新しいコメントを配列の先頭に追加 (新しいものが上になる)
-            comments.unshift(newComment); 
+        const newComment = {
+            comment: form.comment.value,
+            age: form.age.value,
+            gender: form.gender.value
+        };
 
-            // コメントの数を制限 (最新20件のみを保持)
-            const updatedComments = comments.slice(0, MAX_COMMENTS);
+        try {
+            const res = await fetch(`${BASE_URL}/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newComment)
+            });
+            const data = await res.json();
 
-            // localStorageに保存
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedComments));
+            if(data.success) {
+                form.reset();
+                loadComments();
+            } else {
+                alert("送信に失敗しました");
+            }
+        } catch(err) {
+            console.error(err);
+            alert("通信エラーです");
+        }
+    });
 
-            // コメントリストを更新
-            loadComments();
-
-            // フォームをリセット
-            form.reset();
-
-            // 年齢と性別のセレクトボックスをリセット後の初期状態に戻す
-            form.age.value = '';
-            form.gender.value = '';
-
-            alert('コメントを送信しました。');
-        });
-
-        // ページ読み込み時にコメントを表示
-        document.addEventListener('DOMContentLoaded', loadComments);
+    // ページ読み込み時にコメントを表示
+    document.addEventListener('DOMContentLoaded', loadComments);
     </script>
+
 </body>
 </html>
