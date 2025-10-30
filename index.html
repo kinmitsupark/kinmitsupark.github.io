@@ -2,36 +2,186 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>公光公園アンケートフォーム</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>あなたにとっての「まちの居場所」は？</title>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
-        h1 { border-bottom: 2px solid #ccc; padding-bottom: 10px; }
-        label { display: block; margin-top: 15px; font-weight: bold; }
-        input[type="text"], textarea, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        button { background-color: #2ea44f; color: white; padding: 10px 15px; margin-top: 20px; border: none; border-radius: 4px; cursor: pointer; }
+        /* ---------------------------------------------------- */
+        /* PC・スマホ共通の基本スタイル */
+        /* ---------------------------------------------------- */
+        body { 
+            font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif; 
+            margin: 0;
+            padding: 0;
+            background-color: #e5f6e3; /* 薄い緑の背景 */
+            color: #333;
+            text-align: center; /* フォーム全体を中央寄せ */
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        h1 { 
+            font-size: 1.8em;
+            color: #2e8b57; /* 濃い緑 */
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        
+        /* フォームのメインエリア */
+        .form-area {
+            background-color: #f0fff0; /* フォーム背景 */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 入力欄、セレクトボックスの共通スタイル */
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        
+        /* コメント入力欄 */
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1em;
+            resize: vertical;
+        }
+
+        /* 送信ボタン */
+        button {
+            background-color: #6aaa64; /* 画像の緑のボタンの色 */
+            color: white;
+            padding: 10px 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #5a9452;
+        }
+
+        /* みんなのコメントセクションのスタイル */
+        .comments-section {
+            margin-top: 40px;
+        }
+
+        .comments-section h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        
+        .comments-section p {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* お花の部分（ここではダミー画像として表現） */
+        .flower-background {
+            /* 実際の画像を使用する場合は、ここに背景画像を設定します */
+            background-image: url('placeholder_flowers.png'); /* 💡 実際にはここに画像を配置 */
+            background-size: cover;
+            background-position: center;
+            height: 300px; /* 見た目を調整 */
+            margin-top: 20px;
+            opacity: 0.8; /* 画像を薄く */
+        }
+
+        /* ---------------------------------------------------- */
+        /* スマホ対応（メディアクエリ） */
+        /* ---------------------------------------------------- */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px 10px;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+                margin-bottom: 20px;
+            }
+            
+            .form-area {
+                padding: 20px 15px;
+            }
+            
+            input[type="text"], select, textarea {
+                padding: 10px;
+                font-size: 0.95em;
+            }
+
+            button {
+                padding: 10px 30px;
+                font-size: 1em;
+            }
+            
+            .flower-background {
+                height: 200px; /* スマホでは高さを低く */
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>あなたにとっての「まちの居場所」は？</h1>
-    <p>居心地の良いまちをみんなでつくりましょう！</p>
+    <div class="container">
+        <h1>🌱 どんな公園がいい？ 🌱</h1>
+        <div class="form-area">
+            <form action="#" method="POST">
+                
+                <textarea 
+                    id="comment" 
+                    name="comment" 
+                    placeholder="コメントをここに入力（最大200文字）" 
+                    maxlength="200"
+                    required
+                ></textarea>
 
-    <form action="" method="POST"> 
-        
-        <label for="name">ここに記入:</label>
-        <input type="text" id="name" name="name">
+                <select id="age" name="age" required>
+                    <option value="" disabled selected>年齢を選択</option>
+                    <option value="10s">10代</option>
+                    <option value="20s">20代</option>
+                    <option value="30s">30代</option>
+                    <option value="40s">40代</option>
+                    <option value="50s">50代</option>
+                    <option value="60over">60代以上</option>
+                </select>
 
-        <label for="frequency">公園の利用頻度:</label>
-        <select id="frequency" name="frequency">
-            <option value="daily">毎日</option>
-            <option value="weekly">週に数回</option>
-            <option value="monthly">月に数回</option>
-            <option value="rarely">めったに利用しない</option>
-        </select>
+                <select id="gender" name="gender" required>
+                    <option value="" disabled selected>性別を選択</option>
+                    <option value="male">男性</option>
+                    <option value="female">女性</option>
+                    <option value="other">その他</option>
+                </select>
 
-        <label for="feedback">ご意見・ご要望:</label>
-        <textarea id="feedback" name="feedback" rows="5"></textarea>
+                <button type="submit">送信</button>
+            </form>
+        </div>
 
-        <button type="submit">送信する</button>
-    </form>
+        <div class="comments-section">
+            <h2>みんなのコメント</h2>
+            <p>クリックすると全文が見れます</p>
+            <div class="flower-background">
+                </div>
+        </div>
+    </div>
 </body>
 </html>
