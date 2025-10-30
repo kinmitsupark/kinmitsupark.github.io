@@ -14,7 +14,7 @@
             padding: 0;
             background-color: #e5f6e3; /* 薄い緑の背景 */
             color: #333;
-            text-align: center; /* フォーム全体を中央寄せ */
+            text-align: center;
         }
         
         .container {
@@ -47,6 +47,7 @@
             border-radius: 5px;
             box-sizing: border-box;
             font-size: 1em;
+            text-align: left; /* テキストの選択肢を左寄せに */
         }
         
         /* コメント入力欄 */
@@ -83,18 +84,43 @@
         /* みんなのコメントセクションのスタイル */
         .comments-section {
             margin-top: 40px;
+            text-align: left; /* コメントの表示を左寄せに */
         }
 
         .comments-section h2 {
             color: #333;
             font-size: 1.5em;
-            margin-bottom: 5px;
+            margin-bottom: 20px;
+            text-align: center; /* タイトルは中央寄せ */
         }
         
-        .comments-section p {
+        /* コメントグリッドのスタイル */
+        .comment-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4列 */
+            gap: 15px; /* コメント間のスペース */
+        }
+
+        .comment-item {
+            background-color: #ffffff; /* 白いコメント背景 */
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #6aaa64; /* 左側に緑のライン */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             font-size: 0.9em;
+            word-wrap: break-word; /* 長い単語の折り返し */
+        }
+
+        .comment-meta {
+            font-size: 0.8em;
             color: #666;
-            margin-bottom: 20px;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .comment-text {
+            white-space: pre-wrap; /* 改行を保持 */
+            line-height: 1.4;
         }
 
         /* お花の部分（ここではダミー画像として表現） */
@@ -104,8 +130,9 @@
             background-size: cover;
             background-position: center;
             height: 300px; /* 見た目を調整 */
-            margin-top: 20px;
+            margin-top: 40px;
             opacity: 0.8; /* 画像を薄く */
+            border-radius: 10px;
         }
 
         /* ---------------------------------------------------- */
@@ -138,6 +165,10 @@
             .flower-background {
                 height: 200px; /* スマホでは高さを低く */
             }
+
+            .comment-grid {
+                grid-template-columns: repeat(2, 1fr); /* スマホでは2列にする */
+            }
         }
     </style>
 </head>
@@ -145,7 +176,7 @@
     <div class="container">
         <h1>🌱 どんな公園がいい？ 🌱</h1>
         <div class="form-area">
-            <form action="#" method="POST">
+            <form id="comment-form"> 
                 
                 <textarea 
                     id="comment" 
@@ -177,11 +208,97 @@
         </div>
 
         <div class="comments-section">
-            <h2>みんなのコメント</h2>
-            <p>クリックすると全文が見れます</p>
-            <div class="flower-background">
+            <h2>みんなのコメント（最新20件）</h2>
+            <div class="comment-grid" id="comment-list">
                 </div>
         </div>
+        
+        <div class="flower-background"></div>
     </div>
+
+    <script>
+        const STORAGE_KEY = 'kinmitsuParkComments';
+        const MAX_COMMENTS = 20; // 最大20コメント
+
+        // ----------------------------------------
+        // コメントのロードと表示
+        // ----------------------------------------
+        function loadComments() {
+            // localStorageからコメントを取得し、JSONとしてパース。データがない場合は空の配列
+            const comments = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const commentListDiv = document.getElementById('comment-list');
+            commentListDiv.innerHTML = ''; // 既存のコメントをクリア
+
+            // 最新のコメントを最大数だけ取得 (新しいものから20件)
+            const latestComments = comments.slice(0, MAX_COMMENTS);
+
+            latestComments.forEach(comment => {
+                const commentItem = document.createElement('div');
+                commentItem.className = 'comment-item';
+
+                // コメント本文
+                const commentText = document.createElement('div');
+                commentText.className = 'comment-text';
+                commentText.textContent = comment.comment; // HTMLエスケープは不要（textContentを使用）
+
+                // 年齢と性別のメタ情報
+                const commentMeta = document.createElement('div');
+                commentMeta.className = 'comment-meta';
+                // 表示用テキストの変換
+                const ageText = document.querySelector(`#age option[value="${comment.age}"]`).textContent || '不明';
+                const genderText = document.querySelector(`#gender option[value="${comment.gender}"]`).textContent || '不明';
+                
+                commentMeta.textContent = `${ageText} / ${genderText}`;
+
+                commentItem.appendChild(commentText);
+                commentItem.appendChild(commentMeta);
+                commentListDiv.appendChild(commentItem);
+            });
+        }
+
+        // ----------------------------------------
+        // フォーム送信処理（コメントの保存）
+        // ----------------------------------------
+        document.getElementById('comment-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // フォームのデフォルト送信をキャンセル
+            
+            const form = event.target;
+            
+            // 入力データを取得
+            const newComment = {
+                comment: form.comment.value,
+                age: form.age.value,
+                gender: form.gender.value,
+                timestamp: new Date().toISOString() // 投稿日時
+            };
+
+            // 既存のコメントをロード
+            const comments = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            
+            // 新しいコメントを配列の先頭に追加 (新しいものが上になる)
+            comments.unshift(newComment); 
+
+            // コメントの数を制限 (最新20件のみを保持)
+            const updatedComments = comments.slice(0, MAX_COMMENTS);
+
+            // localStorageに保存
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedComments));
+
+            // コメントリストを更新
+            loadComments();
+
+            // フォームをリセット
+            form.reset();
+
+            // 年齢と性別のセレクトボックスをリセット後の初期状態に戻す
+            form.age.value = '';
+            form.gender.value = '';
+
+            alert('コメントを送信しました。');
+        });
+
+        // ページ読み込み時にコメントを表示
+        document.addEventListener('DOMContentLoaded', loadComments);
+    </script>
 </body>
 </html>
